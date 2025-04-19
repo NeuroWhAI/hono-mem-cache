@@ -1,11 +1,11 @@
 {
-  "name": "hono-middle-cache",
+  "name": "hono-mem-cache",
   "version": "0.1.0",
   "description": "A Hono middleware for caching responses in memory.",
   "author": "NeuroWhAI",
   "repository": {
     "type": "git",
-    "url": "https://github.com/NeuroWhAI/hono-middle-cache.git"
+    "url": "https://github.com/NeuroWhAI/hono-mem-cache.git"
   },
   "license": "MIT",
   "type": "module",
@@ -54,5 +54,9 @@
     "dts": true,
     "minify": true
   },
-  "keywords": ["hono", "middleware", "cache", "caching", "in-memory"]
+  "keywords": ["hono", "middleware", "cache", "caching", "in-memory"],
+  "dependencies": {
+    "hono": "^4.7.7",
+    "lru-cache": "^11.1.0"
+  }
 }
