@@ -1,0 +1,58 @@
+{
+  "name": "hono-middle-cache",
+  "version": "0.1.0",
+  "description": "A Hono middleware for caching responses in memory.",
+  "author": "NeuroWhAI",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NeuroWhAI/hono-middle-cache.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist", "README.md", "package.json"],
+  "private": false,
+  "scripts": {
+    "build": "tsup --format esm,cjs",
+    "clean": "rimraf dist coverage",
+    "lint": "biome check src/",
+    "lint:fix": "biome check src/ --fix",
+    "format": "biome format src/",
+    "test": "vitest run",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.2",
+    "rimraf": "^6.0.0",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.4",
+    "vitest": "^3.0.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,json,jsonc}": ["biome check --fix --no-errors-on-unmatched"]
+  },
+  "tsup": {
+    "entry": ["src", "!src/**/__tests__/**", "!src/**/*.test.*"],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true,
+    "dts": true,
+    "minify": true
+  },
+  "keywords": ["hono", "middleware", "cache", "caching", "in-memory"]
+}
