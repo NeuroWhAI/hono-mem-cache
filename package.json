@@ -5,7 +5,7 @@
   "author": "NeuroWhAI",
   "repository": {
     "type": "git",
-    "url": "https://github.com/NeuroWhAI/hono-mem-cache.git"
+    "url": "git+https://github.com/NeuroWhAI/hono-mem-cache.git"
   },
   "license": "MIT",
   "type": "module",
