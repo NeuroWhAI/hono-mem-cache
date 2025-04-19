@@ -7,7 +7,7 @@
     "type": "git",
     "url": "git+https://github.com/NeuroWhAI/hono-mem-cache.git"
   },
-  "license": "MIT",
+  "license": "MIT|Apache-2.0",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",

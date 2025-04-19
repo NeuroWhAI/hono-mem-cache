@@ -109,4 +109,9 @@ By default, only GET requests are cached.
 
 ## License
 
-MIT
+This project is licensed under either:
+
+- MIT License
+- Apache License 2.0
+
+You can choose the license that best suits your needs.
