@@ -1,6 +1,6 @@
 {
   "name": "hono-mem-cache",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A Hono middleware for caching responses in memory.",
   "author": "NeuroWhAI",
   "repository": {
