@@ -32,16 +32,7 @@ export interface CacheOptions {
 export function memCache(opts: CacheOptions): MiddlewareHandler {
   const { max, ttl, key } = opts;
 
-  const keyGenerator: KeyGenerator =
-    key ||
-    ((c: Context) => {
-      const url = c.req.url;
-      const method = c.req.method;
-      if (method === 'GET') {
-        return `${method}:${url}`;
-      }
-      return null;
-    });
+  const keyGenerator: KeyGenerator = key || defaultKeyGenerator;
 
   const cache = new LRUCache<string, Response>({
     max,
@@ -65,3 +56,5 @@ export function memCache(opts: CacheOptions): MiddlewareHandler {
     }
   };
 }
+
+const defaultKeyGenerator: KeyGenerator = (c: Context) => (c.req.method === 'GET' ? c.req.url : null);
