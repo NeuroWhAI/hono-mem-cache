@@ -78,6 +78,29 @@ app.use(
 )
 ```
 
+### Custom Response Validation
+
+You can control whether a response should be cached by providing a custom `validate` function. This function receives the request context and should return `true` to cache the response or `false` to skip caching.
+
+```ts
+import { Hono } from 'hono'
+import { memCache } from 'hono-mem-cache'
+
+const app = new Hono()
+
+app.use(
+  '/api/*',
+  memCache({
+    max: 100,
+    ttl: 30000, // 30 seconds
+    validate: (c) => {
+      // Only cache responses with a 200 status code and a specific header
+      return c.res.status === 200 && c.res.headers.get('Cache-Control') === 'public'
+    }
+  })
+)
+```
+
 ## API
 
 ### `memCache(options)`
@@ -91,6 +114,7 @@ Creates a Hono middleware function for caching responses.
 | `max` | `number` | **Required**. The maximum number of items in the cache. |
 | `ttl` | `number` | Optional. Time-to-live in milliseconds. If not set, cache items won't expire. |
 | `key` | `(c: Context) => string \| null \| Promise<string \| null>` | Optional. A function to generate cache keys. Return `null` to skip caching. |
+| `validate` | `(c: Context) => boolean \| Promise<boolean>` | Optional. A function to determine if a response should be cached. |
 
 ### Cache Headers
 
@@ -101,11 +125,13 @@ The middleware automatically adds the following response header:
 
 ## How It Works
 
-1. The middleware generates a cache key based on the request
-2. If a cached response exists, it's served immediately
-3. If not, the request flows through the middleware chain and the response is cached for future requests
+1. The middleware generates a cache key based on the request.
+2. If a cached response exists, it is served immediately.
+3. If no cached response exists:
+   1. The request flows through the middleware chain.
+   2. Only valid responses are cached for future requests.
 
-By default, only GET requests are cached.
+By default, only GET requests with successful (2xx) responses are cached.
 
 ## License
 
