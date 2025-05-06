@@ -2,6 +2,7 @@ import type { Context, MiddlewareHandler } from 'hono';
 import { LRUCache } from 'lru-cache';
 
 export type KeyGenerator = (c: Context) => string | null | Promise<string | null>;
+export type ResponseValidator = (c: Context) => boolean | Promise<boolean>;
 
 export interface CacheOptions {
   /**
@@ -21,6 +22,13 @@ export interface CacheOptions {
    * If not set, the cache key will be generated based on the request method(GET only) and URL.
    */
   key?: KeyGenerator;
+
+  /**
+   * A function to validate the response before caching.
+   * If it returns false, the response will not be cached.
+   * If not set, only successful responses (2xx) will be cached by default.
+   */
+  validate?: ResponseValidator;
 }
 
 /**
@@ -30,9 +38,10 @@ export interface CacheOptions {
  * @returns Middleware handler
  */
 export function memCache(opts: CacheOptions): MiddlewareHandler {
-  const { max, ttl, key } = opts;
+  const { max, ttl, key, validate } = opts;
 
   const keyGenerator: KeyGenerator = key || defaultKeyGenerator;
+  const resValidator: ResponseValidator = validate || defaultResponseValidator;
 
   const cache = new LRUCache<string, Response>({
     max,
@@ -51,10 +60,13 @@ export function memCache(opts: CacheOptions): MiddlewareHandler {
       c.res.headers.set('X-Cache', 'HIT');
     } else {
       await next();
-      cache.set(key, c.res.clone());
+      if (await resValidator(c)) {
+        cache.set(key, c.res.clone());
+      }
       c.res.headers.set('X-Cache', 'MISS');
     }
   };
 }
 
 const defaultKeyGenerator: KeyGenerator = (c: Context) => (c.req.method === 'GET' ? c.req.url : null);
+const defaultResponseValidator: ResponseValidator = (c: Context) => c.res.ok;
