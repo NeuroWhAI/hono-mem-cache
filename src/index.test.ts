@@ -9,6 +9,8 @@ describe('memCache', () => {
       res: {
         headers: new Map(),
         clone: vi.fn().mockReturnValue({ headers: new Map() }),
+        ok: true,
+        status: 200,
       },
     }) as unknown as Context;
 
@@ -139,5 +141,93 @@ describe('memCache', () => {
 
     // Ensure the response was cloned
     expect(context.res.clone).toHaveBeenCalled();
+  });
+
+  it('should cache the response if the custom validate function returns true', async () => {
+    const opts: CacheOptions = {
+      max: 10,
+      ttl: 1000,
+      validate: () => true,
+    };
+    const middleware = memCache(opts);
+
+    const context = createMockContext();
+    const next = createMockNext();
+
+    await middleware(context, next);
+    expect(next).toHaveBeenCalledOnce();
+    expect(context.res.headers.get('X-Cache')).toBe('MISS');
+
+    const context2 = createMockContext();
+    const next2 = createMockNext();
+
+    await middleware(context2, next2);
+    expect(next2).not.toHaveBeenCalled();
+    expect(context2.res.headers.get('X-Cache')).toBe('HIT');
+  });
+
+  it('should not cache the response if the custom validate function returns false', async () => {
+    const opts: CacheOptions = {
+      max: 10,
+      ttl: 1000,
+      validate: () => false,
+    };
+    const middleware = memCache(opts);
+
+    const context = createMockContext();
+    const next = createMockNext();
+
+    await middleware(context, next);
+    expect(next).toHaveBeenCalledOnce();
+    expect(context.res.headers.get('X-Cache')).toBe('MISS');
+
+    const context2 = createMockContext();
+    const next2 = createMockNext();
+
+    await middleware(context2, next2);
+    expect(next2).toHaveBeenCalledOnce();
+    expect(context2.res.headers.get('X-Cache')).toBe('MISS');
+  });
+
+  it('should use the default response validator if no custom validate function is provided', async () => {
+    const opts: CacheOptions = { max: 10, ttl: 1000 };
+    const middleware = memCache(opts);
+
+    const context = createMockContext();
+    const next = createMockNext();
+
+    await middleware(context, next);
+    expect(next).toHaveBeenCalledOnce();
+    expect(context.res.headers.get('X-Cache')).toBe('MISS');
+
+    const context2 = createMockContext();
+    const next2 = createMockNext();
+
+    await middleware(context2, next2);
+    expect(next2).not.toHaveBeenCalled();
+    expect(context2.res.headers.get('X-Cache')).toBe('HIT');
+  });
+
+  it('should handle async custom validate functions', async () => {
+    const opts: CacheOptions = {
+      max: 10,
+      ttl: 1000,
+      validate: async () => true,
+    };
+    const middleware = memCache(opts);
+
+    const context = createMockContext();
+    const next = createMockNext();
+
+    await middleware(context, next);
+    expect(next).toHaveBeenCalledOnce();
+    expect(context.res.headers.get('X-Cache')).toBe('MISS');
+
+    const context2 = createMockContext();
+    const next2 = createMockNext();
+
+    await middleware(context2, next2);
+    expect(next2).not.toHaveBeenCalled();
+    expect(context2.res.headers.get('X-Cache')).toBe('HIT');
   });
 });
