@@ -7,6 +7,7 @@ A lightweight, in-memory caching middleware for [Hono](https://hono.dev/) applic
 - 🚀 Simple LRU-based memory caching
 - ⏱️ Configurable time-to-live (TTL) for cached responses
 - 🔑 Custom cache key generation
+- ✅ Custom response validation for caching
 - 🔄 Automatic cache headers
 
 ## Installation
@@ -80,7 +81,7 @@ app.use(
 
 ### Custom Response Validation
 
-You can control whether a response should be cached by providing a custom `validate` function. This function receives the request context and should return `true` to cache the response or `false` to skip caching.
+You can control whether a response should be cached by providing a custom `validate` function. This function receives the response context and should return `true` to cache the response or `false` to skip caching.
 
 ```ts
 import { Hono } from 'hono'
